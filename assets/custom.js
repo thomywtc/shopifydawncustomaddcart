@@ -7,31 +7,34 @@ document.addEventListener('DOMContentLoaded', ()=> {
       const this_55 = this;
       this_55.currentvariantproduct = document.querySelector(`#fulfillmentTime`);
       this_55.currentvariantproduct.addEventListener('change', this.addSelectedToCart.bind(this));
-      //this_55.currentvariantproduct.addEventListener('change', (evt) => {
-        //this.onSelectChange(evt.target.value)
-      //});
       this_55.existincart = false;
       this_55.viewCart();
     }
     async viewCart() {
-      const response = await fetch('/cart.js', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      const data = await response.json();
-      console.log(data);
-      console.log(data.items);
-      let getitems = data.items
+      let dataviewcart="";
       const options = Array.from(this.currentvariantproduct.options);
-      getitems.forEach((item,index)=>{
-        let searchopt = options.filter(element => element.value==item.variant_id);
-        if(searchopt.length>0){
-          this.existincart = item;
-          this.existincart.line=index+1;
+      try {
+        const response = await fetch('/cart.js', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
         }
-      });
-      console.log("this.existincart");
-      console.log(this.existincart);
+        dataviewcart = await response.json();
+        
+      } catch (error) {
+          console.error('Error fetching data:', error);
+      } finally {
+        let dataviewcart = data.items
+        getitems.forEach((item,index)=>{
+          let searchopt = options.filter(element => element.value==item.variant_id);
+          if(searchopt.length>0){
+            this.existincart = item;
+            this.existincart.line=index+1;
+          }
+        }); 
+      }
     }
     
     async addSelectedToCart (s) {
